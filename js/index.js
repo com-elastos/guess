@@ -169,6 +169,11 @@
 
   var appGuess = {
     apiRoot: 'http://elahive.club/api/', // 接口路径
+    dataTime: '', // 接口返回的时间
+    dataMonth: '', // 接口返回的时间月份
+    dataDate: '', // 接口返回的时间日期
+    dataHour: '', // 皆苦返回的时间小时
+    dataMinute: '', // 接口返回的时间分钟
 
     initDom: function initDom() {
       // 调用实例
@@ -231,11 +236,11 @@
 
             // 大盘指数
             var dataTime = new Date(parseInt(info.id) * 1000);
-            var dataMonth = dataTime.getMonth() + 1;
-            var dataDate  = dataTime.getDate();
-            var dataHour = dataTime.getHours();
-            var dataMinute = dataTime.getMinutes();
-            $('.mark').html(dataMonth + '月' + dataDate + '日 大盘指数:<span class="mark-desc">12000  2.58%</span>');
+            _Self.dataMonth = dataTime.getMonth() + 1;
+            _Self.dataDate  = dataTime.getDate();
+            _Self.dataHour = dataTime.getHours();
+            _Self.dataMinute = dataTime.getMinutes();
+            $('.mark').html(_Self.dataMonth + '月' + _Self.dataDate + '日 大盘指数:<span class="mark-desc">12000  2.58%</span>');
 
             // 价格波动 // TODO 可以考虑数字颜色——红涨绿跌，根据incressRate的正负识别涨跌
             var incressRate = ((info.prices[1] - info.prices[0]) * 100 / info.prices[0]).toFixed(2);
@@ -253,21 +258,54 @@
             rightPercent.html(downProgressBar);
 
             // TODO cookies里需要存储竞猜选择及时间戳
-			// 根据时间及cookies识别——竞猜按钮/已竞猜/不能竞猜/竞猜结果
-            if (dataHour == 15 && dataMinute <= 30) {
+            // 根据时间及cookies识别——竞猜按钮/已竞猜/不能竞猜/竞猜结果
+
+            var prodictDOm = $('.prodict-dom'), btnsBox = $('.btns-box');
+            var prodictR = JSON.parse(window.localStorage.getItem('prodictReult'))
+
+            if (_Self.dataHour == 15 && _Self.dataMinute <= 30) {
                 // TODO 是否需要轮询接口以自动刷新？哪个接口及字段是结果？
                 // 15:00  到15:30  显示竞猜结果  判断依据是本地提交的记录,
                 //如果cookie没有值，提示当日预言已经截止，请15:30分后预言下一场
-            } else if (dataHour >= 12 && dataHour < 15) {
+
+                // 如果没有竞猜的记录则不继续下走
+                if(prodictR == null || prodictR == {} || !prodictR) {
+                  prodictDOm.find('h4').empty().text('当日预言已经截止')
+                  prodictDOm.find('p').empty().text('请15:30分后预言下一场')
+                }
+                window.localStorage.setItem('prodictReult', '{}');
+                btnsBox.hide()
+                prodictDOm.show()
+
+            } else if (_Self.dataHour >= 12 && _Self.dataHour < 15) {
                 // TODO 识别cookies里的竞猜选择并展示文案
                 // 12:00  到15:00     不能竞猜，等待下一场,
                 //cookie有值显示，你已经预言"涨", 预计15:30分出结果
                 //界面显示。当日预言已经截止，请15:30分后预言下一场
+                if(prodictR && prodictR.status == 1) {
+                  prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
+                } else {
+                  prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
+                }
+                btnsBox.hide()
+                prodictDOm.show()
             } else {
                 // TODO 可以竞猜，需要识别cookies里的时间戳是否是本轮竞猜，是则禁止，不是则清理、允许用户竞猜、存储cookies
                 // T-1日的15：30到T日的12:00  ：
                 //先比较cookie,如果没有值可以竞猜，有值显示，你已经预言"", 预计15:30分出结果，
                 //如果没有值 界面显示 涨和跌的按钮
+                if(prodictR) {
+                  if(prodictR.status == 1) {
+                    prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
+                  } else {
+                    prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
+                  }
+                  btnsBox.hide()
+                  prodictDOm.show()
+                } else {
+                  btnsBox.show()
+                  prodictDOm.hide()
+                }
             }
 
           // }
@@ -285,8 +323,8 @@
     initBetUl: function initBetUl() {
       var prodictResult = $('.prodict-result'), prodictStr= '', str = '猜对预计可得<span>40积分</span>，仅供参考';
       $('.bet-ul li').on('click', function(el) {
-		//TODO 这里记得修改7月9号的那个日期，那个日期是从api接口里面返回。
-		//点击涨和跌的时候记得使用内部浏览器打开www.baid.com即可。
+      //TODO 这里记得修改7月9号的那个日期，那个日期是从api接口里面返回。
+      //点击涨和跌的时候记得使用内部浏览器打开www.baid.com即可。
         el.preventDefault();
         $(this).addClass('current').siblings('li').removeClass('current');
         var thisVal = $(this).data('value');
@@ -296,7 +334,7 @@
     },
 
     initSomeDom: function initSomeDom() {
-      var lookWrap = $('#look_wrap'), downBtn = $('.down-btn');
+      var lookWrap = $('#look_wrap'), downBtn = $('.down-btn'), prodictDOm = $('.prodict-dom');
       $('span.close').on('click', function(el) {
         el.preventDefault()
         var dialogWrap = $('.dialog-wrap')
@@ -306,15 +344,47 @@
       $('.btns-box div').on('click', function(el) {
         var $this = $(this)
         el.preventDefault()
+        if (_Self.dataHour == 15 && _Self.dataMinute <= 30) {
+          prodictDOm.find('h4').empty().text('当日预言已经截止')
+          prodictDOm.find('p').empty().text('请15:30分后预言下一场')
+          btnsBox.hide()
+          prodictDOm.show()
+        }
         // 看涨
         if($this.hasClass('up')) {
           lookWrap.find('.look').removeClass('look-down').addClass('look-up')
-          downBtn.find('h5').empty().text('我要看涨')
+          downBtn.attr('data-status', true).find('h5').empty().text('我要看涨')
         } else { // 看跌
           lookWrap.find('.look').removeClass('look-up').addClass('look-down')
-          downBtn.find('h5').empty().text('我要看跌')
+          downBtn.attr('data-status', false).find('h5').empty().text('我要看跌')
         }
         lookWrap.fadeIn(300)
+      })
+
+      downBtn.on('click', function(el) {
+        el.preventDefault();
+        var thisStatus = $(this).attr('data-status')
+        var prodictR = {}
+        $('.bet-ul li').each(function(index, item) {
+          if($(item).hasClass('current')) {
+            prodictR.value = $(item).attr('data-value')
+          }
+        })
+        
+        // 只记录当前一条记录
+        window.localStorage.setItem('prodictReult', '{}');
+        // 1表示涨， 2表示跌
+        if(thisStatus && thisStatus == 'true') {
+          prodictR.status = 1
+          prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
+        } else {
+          prodictR.status = 2
+          prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
+        }
+        window.localStorage.setItem('prodictReult', JSON.stringify(prodictR));
+        lookWrap.fadeOut(200)
+        $('.btns-box').fadeOut(200)
+        prodictDOm.fadeIn(300)
       })
     }
   }
