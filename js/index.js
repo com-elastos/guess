@@ -169,18 +169,29 @@
 
   var appGuess = {
     apiRoot: 'http://elahive.club/api/', // 接口路径
-    dataTime: '', // 接口返回的时间
     dataMonth: '', // 接口返回的时间月份
     dataDate: '', // 接口返回的时间日期
     dataHour: '', // 皆苦返回的时间小时
     dataMinute: '', // 接口返回的时间分钟
+    lastTimestamp: '', // 前一天时间的时间戳
+    lastDate: '', // 前一天时间日期
+    currentTimestamp: new Date().getTime(), // 当前时间的时间戳
+    currentDate: factoryMethods.formatDate(this.currentTimestamp, 'yyyy-MM-dd'), // 当前时间日期
 
     initDom: function initDom() {
       // 调用实例
-      //console.error(factoryMethods.formatDate('1562590479', 'yyyy-MM-dd HH:mm:ss'))
+      // console.error(factoryMethods.formatDate('1562848146527', 'yyyy-MM-dd'))
       // factoryMethods.formatDate('1562590479', 'yyyy-MM-dd HH:mm:ss')
 
-      Cookies.set('name', 'value', { expires: 7 });
+      // Cookies.set('name', 'value', { expires: 7 });
+      this.lastTimestamp = new Date().getTime()-24*60*60*1000
+      this.currentTimestamp = new Date().getTime()
+      this.lastDate = factoryMethods.formatDate(this.lastTimestamp, 'yyyy-MM-dd')
+      this.currentDate = factoryMethods.formatDate(this.currentTimestamp, 'yyyy-MM-dd')
+      // console.error(this.lastTimestamp)
+      // console.error(this.lastDate)
+      // console.error(this.currentTimestamp)
+      // console.error(this.currentDate)
 
       // 初始化API地址
       // this.initApi()
@@ -235,7 +246,7 @@
             $('.module-two').find('h4').empty().html('当前奖池<span>'+amounts+'</span>积分')
 
             // 大盘指数
-            var dataTime = new Date(parseInt(info.id) * 1000);
+            var dataTime = new Date(parseInt(info.ids[1]) * 1000);
             _Self.dataMonth = dataTime.getMonth() + 1;
             _Self.dataDate  = dataTime.getDate();
             _Self.dataHour = dataTime.getHours();
@@ -261,52 +272,134 @@
             // 根据时间及cookies识别——竞猜按钮/已竞猜/不能竞猜/竞猜结果
 
             var prodictDOm = $('.prodict-dom'), btnsBox = $('.btns-box');
-            var prodictR = JSON.parse(window.localStorage.getItem('prodictReult'))
+            var prodictLast, prodictHistory = JSON.parse(window.localStorage.getItem('prodictHistory')) || []
+            if(prodictHistory.length > 0) {
+              prodictLast = prodictHistory[prodictHistory.length -1]
+            }
 
-            if (_Self.dataHour == 15 && _Self.dataMinute <= 30) {
-                // TODO 是否需要轮询接口以自动刷新？哪个接口及字段是结果？
-                // 15:00  到15:30  显示竞猜结果  判断依据是本地提交的记录,
-                //如果cookie没有值，提示当日预言已经截止，请15:30分后预言下一场
-
-                // 如果没有竞猜的记录则不继续下走
-                if(prodictR == null || prodictR == {} || !prodictR) {
+            if(_Self.dataHour < 12) {
+              if(prodictLast) {
+                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate) {
+                  if(prodictLast.status == 1) {
+                    prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
+                  } else {
+                    prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
+                  }
+                } 
+                btnsBox.hide()
+                prodictDOm.show()
+              }
+            } else if(_Self.dataHour >= 12 && _Self.dataHour <15 ) {
+              if(prodictLast) {
+                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate) {
+                  if(prodictLast.status == 1) {
+                    prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
+                  } else {
+                    prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
+                  }
+                } else {
                   prodictDOm.find('h4').empty().text('当日预言已经截止')
                   prodictDOm.find('p').empty().text('请15:30分后预言下一场')
                 }
-                window.localStorage.setItem('prodictReult', '{}');
-                btnsBox.hide()
-                prodictDOm.show()
-
-            } else if (_Self.dataHour >= 12 && _Self.dataHour < 15) {
-                // TODO 识别cookies里的竞猜选择并展示文案
-                // 12:00  到15:00     不能竞猜，等待下一场,
-                //cookie有值显示，你已经预言"涨", 预计15:30分出结果
-                //界面显示。当日预言已经截止，请15:30分后预言下一场
-                if(prodictR && prodictR.status == 1) {
-                  prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
+              } else {
+                prodictDOm.find('h4').empty().text('当日预言已经截止')
+                prodictDOm.find('p').empty().text('请15:30分后预言下一场')
+              }
+              btnsBox.hide()
+              prodictDOm.show()
+            } else if(_Self.dataHour == 15 && _Self.dataMinute <= 30 ) {
+              if(prodictLast) {
+                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate) {
+                  if(prodictLast.status == 1) {
+                    prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
+                  } else {
+                    prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
+                  }
                 } else {
-                  prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
+                  prodictDOm.find('h4').empty().text('当日预言已经截止')
+                  prodictDOm.find('p').empty().text('请15:30分后预言下一场')
                 }
-                btnsBox.hide()
-                prodictDOm.show()
+              } else {
+                prodictDOm.find('h4').empty().text('当日预言已经截止')
+                prodictDOm.find('p').empty().text('请15:30分后预言下一场')
+              }
+              btnsBox.hide()
+              prodictDOm.show()
             } else {
-                // TODO 可以竞猜，需要识别cookies里的时间戳是否是本轮竞猜，是则禁止，不是则清理、允许用户竞猜、存储cookies
-                // T-1日的15：30到T日的12:00  ：
-                //先比较cookie,如果没有值可以竞猜，有值显示，你已经预言"", 预计15:30分出结果，
-                //如果没有值 界面显示 涨和跌的按钮
-                if(prodictR) {
-                  if(prodictR.status == 1) {
+              if(prodictLast) {
+                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate) {
+                  if(prodictLast.status == 1) {
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
                   } else {
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
                   }
                   btnsBox.hide()
                   prodictDOm.show()
-                } else {
-                  btnsBox.show()
-                  prodictDOm.hide()
                 }
+              }
             }
+
+            // if (_Self.dataHour == 15 && _Self.dataMinute <= 30) {
+            //     // TODO 是否需要轮询接口以自动刷新？哪个接口及字段是结果？
+            //     // 15:00  到15:30  显示竞猜结果  判断依据是本地提交的记录,
+            //     //如果cookie没有值，提示当日预言已经截止，请15:30分后预言下一场
+
+            //     // 如果没有竞猜的记录则不继续下走
+            //     if(prodictLast) {
+            //       if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate) {
+            //         if(prodictLast.status == 1) {
+            //           prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
+            //         } else {
+            //           prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
+            //         }
+            //       } else {
+            //         prodictDOm.find('h4').empty().text('当日预言已经截止')
+            //         prodictDOm.find('p').empty().text('请15:30分后预言下一场')
+            //       }
+            //     } else {
+            //       prodictDOm.find('h4').empty().text('当日预言已经截止')
+            //       prodictDOm.find('p').empty().text('请15:30分后预言下一场')
+            //     }
+            //     btnsBox.hide()
+            //     prodictDOm.show()
+
+            // } else if (_Self.dataHour >= 12 && _Self.dataHour < 15) {
+            //     // TODO 识别cookies里的竞猜选择并展示文案
+            //     // 12:00  到15:00     不能竞猜，等待下一场,
+            //     //cookie有值显示，你已经预言"涨", 预计15:30分出结果
+            //     //界面显示。当日预言已经截止，请15:30分后预言下一场
+            //     if(prodictLast) {
+            //       if(prodictLast.status == 1) {
+            //         prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
+            //       } else {
+            //         prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
+            //       }
+            //     } else {
+            //       prodictDOm.find('h4').empty().text('当日预言已经截止')
+            //       prodictDOm.find('p').empty().text('请15:30分后预言下一场')
+            //     }
+            //     btnsBox.hide()
+            //     prodictDOm.show()
+            // } else if (_Self.dataHour < 12) {
+
+            // } else {
+            //     // TODO 可以竞猜，需要识别cookies里的时间戳是否是本轮竞猜，是则禁止，不是则清理、允许用户竞猜、存储cookies
+            //     // T-1日的15：30到T日的12:00  ：
+            //     //先比较cookie,如果没有值可以竞猜，有值显示，你已经预言"", 预计15:30分出结果，
+            //     //如果没有值 界面显示 涨和跌的按钮
+            //     if(prodictLast) {
+            //       if(prodictLast.status == 1) {
+            //         prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
+            //       } else {
+            //         prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
+            //       }
+            //       btnsBox.hide()
+            //       prodictDOm.show()
+            //     } else {
+            //       btnsBox.show()
+            //       prodictDOm.hide()
+            //     }
+            // }
 
           // }
         },
@@ -321,6 +414,7 @@
 
     // 点击档位，结果预览
     initBetUl: function initBetUl() {
+      var _Self = this;
       var prodictResult = $('.prodict-result'), prodictStr= '', str = '猜对预计可得<span>40积分</span>，仅供参考';
       $('.bet-ul li').on('click', function(el) {
       //TODO 这里记得修改7月9号的那个日期，那个日期是从api接口里面返回。
@@ -328,12 +422,13 @@
         el.preventDefault();
         $(this).addClass('current').siblings('li').removeClass('current');
         var thisVal = $(this).data('value');
-        prodictStr = '猜对预计可得<span>' + thisVal + '</span>，仅供参考'
+        prodictStr = '猜对预计可得<span>' + thisVal + '积分</span>，仅供参考'
         prodictResult.empty().html(prodictStr);
       })
     },
 
     initSomeDom: function initSomeDom() {
+      var _Self = this;
       var lookWrap = $('#look_wrap'), downBtn = $('.down-btn'), prodictDOm = $('.prodict-dom');
       $('span.close').on('click', function(el) {
         el.preventDefault()
@@ -372,7 +467,7 @@
         })
         
         // 只记录当前一条记录
-        window.localStorage.setItem('prodictReult', '{}');
+        var prodictHistory = JSON.parse(window.localStorage.getItem('prodictHistory')) || []
         // 1表示涨， 2表示跌
         if(thisStatus && thisStatus == 'true') {
           prodictR.status = 1
@@ -381,7 +476,9 @@
           prodictR.status = 2
           prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
         }
-        window.localStorage.setItem('prodictReult', JSON.stringify(prodictR));
+        prodictR.timestamp = new Date().getTime()
+        prodictHistory.push(prodictR)
+        window.localStorage.setItem('prodictHistory', JSON.stringify(prodictHistory));
         lookWrap.fadeOut(200)
         $('.btns-box').fadeOut(200)
         prodictDOm.fadeIn(300)
