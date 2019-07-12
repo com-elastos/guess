@@ -279,31 +279,33 @@
 
             if(_Self.dataHour < 12) {
               if(prodictLast) {
-                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate) {
+                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate || factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate) {
                   if(prodictLast.status == 1) {
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
                   } else {
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
                   }
+                  prodictDOm.find('p').empty().text('今日15:30分结果揭晓')
                 } 
                 btnsBox.hide()
                 prodictDOm.show()
               }
             } else if(_Self.dataHour >= 12 && _Self.dataHour <15 ) {
               if(prodictLast) {
-                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate) {
+                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate || factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate) {
                   if(prodictLast.status == 1) {
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
                   } else {
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
                   }
+                  prodictDOm.find('p').empty().text('今日15:30分结果揭晓')
                 } else {
                   prodictDOm.find('h4').empty().text('当日预言已经截止')
-                  prodictDOm.find('p').empty().text('请15:30分后预言下一场')
+                  prodictDOm.find('p').empty().text('请在15:30分后预言下一场')
                 }
               } else {
                 prodictDOm.find('h4').empty().text('当日预言已经截止')
-                prodictDOm.find('p').empty().text('请15:30分后预言下一场')
+                prodictDOm.find('p').empty().text('请在15:30分后预言下一场')
               }
               btnsBox.hide()
               prodictDOm.show()
@@ -315,24 +317,28 @@
                   } else {
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
                   }
+                  prodictDOm.find('p').empty().text('本次获得积分为'+ prodictLast.value  +'')
                 } else {
                   prodictDOm.find('h4').empty().text('当日预言已经截止')
-                  prodictDOm.find('p').empty().text('请15:30分后预言下一场')
+                  prodictDOm.find('p').empty().text('请在15:30分后预言下一场')
                 }
               } else {
                 prodictDOm.find('h4').empty().text('当日预言已经截止')
-                prodictDOm.find('p').empty().text('请15:30分后预言下一场')
+                prodictDOm.find('p').empty().text('请在15:30分后预言下一场')
               }
               btnsBox.hide()
               prodictDOm.show()
             } else {
+              // 根据最后一个历史时间戳的hour来判断同一天预测的是上午还是下午预测的
+              var lastHour = new Date(prodictLast.timestamp).getHours();
               if(prodictLast) {
-                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate) {
+                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate && lastHour > 13 ) {
                   if(prodictLast.status == 1) {
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
                   } else {
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
                   }
+                  prodictDOm.find('p').empty().text('预计下一个交易日15：30结果揭晓')
                   btnsBox.hide()
                   prodictDOm.show()
                 }
@@ -419,6 +425,9 @@
       $('.bet-ul li').on('click', function(el) {
       //TODO 这里记得修改7月9号的那个日期，那个日期是从api接口里面返回。
       //点击涨和跌的时候记得使用内部浏览器打开www.baid.com即可。
+
+      // 当前页面跳转到baidu => window.location.href = 'https://www.baidu.com'
+      // 新页面打来百度的方法 =》 window.open('https://www.baidu.com', '_blank')
         el.preventDefault();
         $(this).addClass('current').siblings('li').removeClass('current');
         var thisVal = $(this).data('value');
