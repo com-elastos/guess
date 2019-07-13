@@ -1,160 +1,160 @@
 ;(function (factory) {
-	var registeredInModuleLoader = false;
-	if (typeof define === 'function' && define.amd) {
-		define(factory);
-		registeredInModuleLoader = true;
-	}
-	if (typeof exports === 'object') {
-		module.exports = factory();
-		registeredInModuleLoader = true;
-	}
-	if (!registeredInModuleLoader) {
-		var OldCookies = window.Cookies;
-		var api = window.Cookies = factory();
-		api.noConflict = function () {
-			window.Cookies = OldCookies;
-			return api;
-		};
-	}
+    var registeredInModuleLoader = false;
+    if (typeof define === 'function' && define.amd) {
+        define(factory);
+        registeredInModuleLoader = true;
+    }
+    if (typeof exports === 'object') {
+        module.exports = factory();
+        registeredInModuleLoader = true;
+    }
+    if (!registeredInModuleLoader) {
+        var OldCookies = window.Cookies;
+        var api = window.Cookies = factory();
+        api.noConflict = function () {
+            window.Cookies = OldCookies;
+            return api;
+        };
+    }
 }(function () {
-	function extend () {
-		var i = 0;
-		var result = {};
-		for (; i < arguments.length; i++) {
-			var attributes = arguments[ i ];
-			for (var key in attributes) {
-				result[key] = attributes[key];
-			}
-		}
-		return result;
-	}
+    function extend () {
+        var i = 0;
+        var result = {};
+        for (; i < arguments.length; i++) {
+            var attributes = arguments[ i ];
+            for (var key in attributes) {
+                result[key] = attributes[key];
+            }
+        }
+        return result;
+    }
 
-	function init (converter) {
-		function api (key, value, attributes) {
-			var result;
-			if (typeof document === 'undefined') {
-				return;
-			}
+    function init (converter) {
+        function api (key, value, attributes) {
+            var result;
+            if (typeof document === 'undefined') {
+                return;
+            }
 
-			// Write
+            // Write
 
-			if (arguments.length > 1) {
-				attributes = extend({
-					path: '/'
-				}, api.defaults, attributes);
+            if (arguments.length > 1) {
+                attributes = extend({
+                    path: '/'
+                }, api.defaults, attributes);
 
-				if (typeof attributes.expires === 'number') {
-					var expires = new Date();
-					expires.setMilliseconds(expires.getMilliseconds() + attributes.expires * 864e+5);
-					attributes.expires = expires;
-				}
+                if (typeof attributes.expires === 'number') {
+                    var expires = new Date();
+                    expires.setMilliseconds(expires.getMilliseconds() + attributes.expires * 864e+5);
+                    attributes.expires = expires;
+                }
 
-				// We're using "expires" because "max-age" is not supported by IE
-				attributes.expires = attributes.expires ? attributes.expires.toUTCString() : '';
+                // We're using "expires" because "max-age" is not supported by IE
+                attributes.expires = attributes.expires ? attributes.expires.toUTCString() : '';
 
-				try {
-					result = JSON.stringify(value);
-					if (/^[\{\[]/.test(result)) {
-						value = result;
-					}
-				} catch (e) {}
+                try {
+                    result = JSON.stringify(value);
+                    if (/^[\{\[]/.test(result)) {
+                        value = result;
+                    }
+                } catch (e) {}
 
-				if (!converter.write) {
-					value = encodeURIComponent(String(value))
-						.replace(/%(23|24|26|2B|3A|3C|3E|3D|2F|3F|40|5B|5D|5E|60|7B|7D|7C)/g, decodeURIComponent);
-				} else {
-					value = converter.write(value, key);
-				}
+                if (!converter.write) {
+                    value = encodeURIComponent(String(value))
+                        .replace(/%(23|24|26|2B|3A|3C|3E|3D|2F|3F|40|5B|5D|5E|60|7B|7D|7C)/g, decodeURIComponent);
+                } else {
+                    value = converter.write(value, key);
+                }
 
-				key = encodeURIComponent(String(key));
-				key = key.replace(/%(23|24|26|2B|5E|60|7C)/g, decodeURIComponent);
-				key = key.replace(/[\(\)]/g, escape);
+                key = encodeURIComponent(String(key));
+                key = key.replace(/%(23|24|26|2B|5E|60|7C)/g, decodeURIComponent);
+                key = key.replace(/[\(\)]/g, escape);
 
-				var stringifiedAttributes = '';
+                var stringifiedAttributes = '';
 
-				for (var attributeName in attributes) {
-					if (!attributes[attributeName]) {
-						continue;
-					}
-					stringifiedAttributes += '; ' + attributeName;
-					if (attributes[attributeName] === true) {
-						continue;
-					}
-					stringifiedAttributes += '=' + attributes[attributeName];
-				}
-				return (document.cookie = key + '=' + value + stringifiedAttributes);
-			}
+                for (var attributeName in attributes) {
+                    if (!attributes[attributeName]) {
+                        continue;
+                    }
+                    stringifiedAttributes += '; ' + attributeName;
+                    if (attributes[attributeName] === true) {
+                        continue;
+                    }
+                    stringifiedAttributes += '=' + attributes[attributeName];
+                }
+                return (document.cookie = key + '=' + value + stringifiedAttributes);
+            }
 
-			// Read
+            // Read
 
-			if (!key) {
-				result = {};
-			}
+            if (!key) {
+                result = {};
+            }
 
-			// To prevent the for loop in the first place assign an empty array
-			// in case there are no cookies at all. Also prevents odd result when
-			// calling "get()"
-			var cookies = document.cookie ? document.cookie.split('; ') : [];
-			var rdecode = /(%[0-9A-Z]{2})+/g;
-			var i = 0;
+            // To prevent the for loop in the first place assign an empty array
+            // in case there are no cookies at all. Also prevents odd result when
+            // calling "get()"
+            var cookies = document.cookie ? document.cookie.split('; ') : [];
+            var rdecode = /(%[0-9A-Z]{2})+/g;
+            var i = 0;
 
-			for (; i < cookies.length; i++) {
-				var parts = cookies[i].split('=');
-				var cookie = parts.slice(1).join('=');
+            for (; i < cookies.length; i++) {
+                var parts = cookies[i].split('=');
+                var cookie = parts.slice(1).join('=');
 
-				if (!this.json && cookie.charAt(0) === '"') {
-					cookie = cookie.slice(1, -1);
-				}
+                if (!this.json && cookie.charAt(0) === '"') {
+                    cookie = cookie.slice(1, -1);
+                }
 
-				try {
-					var name = parts[0].replace(rdecode, decodeURIComponent);
-					cookie = converter.read ?
-						converter.read(cookie, name) : converter(cookie, name) ||
-						cookie.replace(rdecode, decodeURIComponent);
+                try {
+                    var name = parts[0].replace(rdecode, decodeURIComponent);
+                    cookie = converter.read ?
+                        converter.read(cookie, name) : converter(cookie, name) ||
+                        cookie.replace(rdecode, decodeURIComponent);
 
-					if (this.json) {
-						try {
-							cookie = JSON.parse(cookie);
-						} catch (e) {}
-					}
+                    if (this.json) {
+                        try {
+                            cookie = JSON.parse(cookie);
+                        } catch (e) {}
+                    }
 
-					if (key === name) {
-						result = cookie;
-						break;
-					}
+                    if (key === name) {
+                        result = cookie;
+                        break;
+                    }
 
-					if (!key) {
-						result[name] = cookie;
-					}
-				} catch (e) {}
-			}
+                    if (!key) {
+                        result[name] = cookie;
+                    }
+                } catch (e) {}
+            }
 
-			return result;
-		}
+            return result;
+        }
 
-		api.set = api;
-		api.get = function (key) {
-			return api.call(api, key);
-		};
-		api.getJSON = function () {
-			return api.apply({
-				json: true
-			}, [].slice.call(arguments));
-		};
-		api.defaults = {};
+        api.set = api;
+        api.get = function (key) {
+            return api.call(api, key);
+        };
+        api.getJSON = function () {
+            return api.apply({
+                json: true
+            }, [].slice.call(arguments));
+        };
+        api.defaults = {};
 
-		api.remove = function (key, attributes) {
-			api(key, '', extend(attributes, {
-				expires: -1
-			}));
-		};
+        api.remove = function (key, attributes) {
+            api(key, '', extend(attributes, {
+                expires: -1
+            }));
+        };
 
-		api.withConverter = init;
+        api.withConverter = init;
 
-		return api;
-	}
+        return api;
+    }
 
-	return init(function () {});
+    return init(function () {});
 }));
 // 以上为JS-cookie
 // 设置一个时间为7天的cookie Cookies.set('name', 'value', { expires: 7 });
@@ -166,12 +166,18 @@
 ;(function(global, factory) {
   // 调用一些factory方法
   var factoryMethods = factory(global)
+  
+  var voteEndtime = 12;
+  
+  var voteBegintime= 15;
+  
+  var info
 
   var appGuess = {
     apiRoot: 'http://elahive.club/api/', // 接口路径
     dataMonth: '', // 接口返回的时间月份
     dataDate: '', // 接口返回的时间日期
-    dataHour: '', // 皆苦返回的时间小时
+    dataHour: '', // 接口返回的时间小时
     dataMinute: '', // 接口返回的时间分钟
     lastTimestamp: '', // 前一天时间的时间戳
     lastDate: '', // 前一天时间日期
@@ -184,7 +190,9 @@
       // factoryMethods.formatDate('1562590479', 'yyyy-MM-dd HH:mm:ss')
 
       // Cookies.set('name', 'value', { expires: 7 });
+      //预测昨天的期数
       this.lastTimestamp = new Date().getTime()-24*60*60*1000
+      //预测当天的期数
       this.currentTimestamp = new Date().getTime()
       this.lastDate = factoryMethods.formatDate(this.lastTimestamp, 'yyyy-MM-dd')
       this.currentDate = factoryMethods.formatDate(this.currentTimestamp, 'yyyy-MM-dd')
@@ -239,23 +247,28 @@
         success: function(res) {
             // TODO res及其必要元素判空等逻辑
             // if () {
-            var info = res.data[0];
+            info = res.data[0];
 
             // 总奖金池
             var amounts = parseFloat(info.amounts[0] + info.amounts[1]).toFixed(2);
             $('.module-two').find('h4').empty().html('当前奖池<span>'+amounts+'</span>积分')
 
-            // 大盘指数
-            var dataTime = new Date(parseInt(info.ids[1]) * 1000);
+            // 当前大盘指数
+            var dataTime = new Date();
             _Self.dataMonth = dataTime.getMonth() + 1;
             _Self.dataDate  = dataTime.getDate();
             _Self.dataHour = dataTime.getHours();
+
+            // console.error(_Self.dataMonth);
+            // console.error(_Self.dataDate);
+            // console.error(_Self.dataHour);
+             
             _Self.dataMinute = dataTime.getMinutes();
             $('.mark').html(_Self.dataMonth + '月' + _Self.dataDate + '日 大盘指数:<span class="mark-desc">12000  2.58%</span>');
 
             // 价格波动 // TODO 可以考虑数字颜色——红涨绿跌，根据incressRate的正负识别涨跌
             var incressRate = ((info.prices[1] - info.prices[0]) * 100 / info.prices[0]).toFixed(2);
-            $('.mark-desc').html(info.prices[0] + '   ' + incressRate + '%');
+            $('.mark-desc').html(info.prices[1] + '   ' + incressRate + '%');
 
             // 进度百分比
             var leftPercent = $('.percent');
@@ -276,8 +289,11 @@
             if(prodictHistory.length > 0) {
               prodictLast = prodictHistory[prodictHistory.length -1]
             }
+            //规则   0-12点前，如果当期没有预期过，则可以预测，已经预测过，显示预测结果
+            //      12-15点 如果当期没有预期过，则提示请在15:00分后预言下一场，已经预测过，显示预测结果
+            //        15-24点 如果下一期没有预期过，则可以预测，已经预测过，显示预测结果
 
-            if(_Self.dataHour < 12) {
+            if(_Self.dataHour < voteEndtime) {
               if(prodictLast) {
                 if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate || factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate) {
                   if(prodictLast.status == 1) {
@@ -285,12 +301,15 @@
                   } else {
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
                   }
-                  prodictDOm.find('p').empty().text('今日15:30分结果揭晓')
+                  prodictDOm.find('p').empty().text('今日15:00分结果揭晓')
                 } 
                 btnsBox.hide()
                 prodictDOm.show()
+              } else {
+                  btnsBox.show()
+                  prodictDOm.hide()  
               }
-            } else if(_Self.dataHour >= 12 && _Self.dataHour <15 ) {
+            } else if(_Self.dataHour >= voteEndtime && _Self.dataHour < voteBegintime ) {
               if(prodictLast) {
                 if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate || factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate) {
                   if(prodictLast.status == 1) {
@@ -298,33 +317,14 @@
                   } else {
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
                   }
-                  prodictDOm.find('p').empty().text('今日15:30分结果揭晓')
+                  prodictDOm.find('p').empty().text('预计今日15:00分结果揭晓')
                 } else {
                   prodictDOm.find('h4').empty().text('当日预言已经截止')
-                  prodictDOm.find('p').empty().text('请在15:30分后预言下一场')
+                  prodictDOm.find('p').empty().text('请在15:00分后预言下一场')
                 }
               } else {
                 prodictDOm.find('h4').empty().text('当日预言已经截止')
-                prodictDOm.find('p').empty().text('请在15:30分后预言下一场')
-              }
-              btnsBox.hide()
-              prodictDOm.show()
-            } else if(_Self.dataHour == 15 && _Self.dataMinute <= 30 ) {
-              if(prodictLast) {
-                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate) {
-                  if(prodictLast.status == 1) {
-                    prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
-                  } else {
-                    prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
-                  }
-                  prodictDOm.find('p').empty().text('本次获得积分为'+ prodictLast.value  +'')
-                } else {
-                  prodictDOm.find('h4').empty().text('当日预言已经截止')
-                  prodictDOm.find('p').empty().text('请在15:30分后预言下一场')
-                }
-              } else {
-                prodictDOm.find('h4').empty().text('当日预言已经截止')
-                prodictDOm.find('p').empty().text('请在15:30分后预言下一场')
+                prodictDOm.find('p').empty().text('请在15:00分后预言下一场')
               }
               btnsBox.hide()
               prodictDOm.show()
@@ -332,82 +332,21 @@
               // 根据最后一个历史时间戳的hour来判断同一天预测的是上午还是下午预测的
               var lastHour = new Date(prodictLast.timestamp).getHours();
               if(prodictLast) {
-                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate && lastHour > 13 ) {
+                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate && lastHour >= voteBegintime + 20 ) {
                   if(prodictLast.status == 1) {
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
                   } else {
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
                   }
-                  prodictDOm.find('p').empty().text('预计下一个交易日15：30结果揭晓')
+                  prodictDOm.find('p').empty().text('预计下一个交易日15：00结果揭晓')
                   btnsBox.hide()
                   prodictDOm.show()
                 }
+              } else {
+                  btnsBox.show()
+                  prodictDOm.hide()  
               }
             }
-
-            // if (_Self.dataHour == 15 && _Self.dataMinute <= 30) {
-            //     // TODO 是否需要轮询接口以自动刷新？哪个接口及字段是结果？
-            //     // 15:00  到15:30  显示竞猜结果  判断依据是本地提交的记录,
-            //     //如果cookie没有值，提示当日预言已经截止，请15:30分后预言下一场
-
-            //     // 如果没有竞猜的记录则不继续下走
-            //     if(prodictLast) {
-            //       if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate) {
-            //         if(prodictLast.status == 1) {
-            //           prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
-            //         } else {
-            //           prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
-            //         }
-            //       } else {
-            //         prodictDOm.find('h4').empty().text('当日预言已经截止')
-            //         prodictDOm.find('p').empty().text('请15:30分后预言下一场')
-            //       }
-            //     } else {
-            //       prodictDOm.find('h4').empty().text('当日预言已经截止')
-            //       prodictDOm.find('p').empty().text('请15:30分后预言下一场')
-            //     }
-            //     btnsBox.hide()
-            //     prodictDOm.show()
-
-            // } else if (_Self.dataHour >= 12 && _Self.dataHour < 15) {
-            //     // TODO 识别cookies里的竞猜选择并展示文案
-            //     // 12:00  到15:00     不能竞猜，等待下一场,
-            //     //cookie有值显示，你已经预言"涨", 预计15:30分出结果
-            //     //界面显示。当日预言已经截止，请15:30分后预言下一场
-            //     if(prodictLast) {
-            //       if(prodictLast.status == 1) {
-            //         prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
-            //       } else {
-            //         prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
-            //       }
-            //     } else {
-            //       prodictDOm.find('h4').empty().text('当日预言已经截止')
-            //       prodictDOm.find('p').empty().text('请15:30分后预言下一场')
-            //     }
-            //     btnsBox.hide()
-            //     prodictDOm.show()
-            // } else if (_Self.dataHour < 12) {
-
-            // } else {
-            //     // TODO 可以竞猜，需要识别cookies里的时间戳是否是本轮竞猜，是则禁止，不是则清理、允许用户竞猜、存储cookies
-            //     // T-1日的15：30到T日的12:00  ：
-            //     //先比较cookie,如果没有值可以竞猜，有值显示，你已经预言"", 预计15:30分出结果，
-            //     //如果没有值 界面显示 涨和跌的按钮
-            //     if(prodictLast) {
-            //       if(prodictLast.status == 1) {
-            //         prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
-            //       } else {
-            //         prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
-            //       }
-            //       btnsBox.hide()
-            //       prodictDOm.show()
-            //     } else {
-            //       btnsBox.show()
-            //       prodictDOm.hide()
-            //     }
-            // }
-
-          // }
         },
         error: function(err) {
           console.error(err);
@@ -423,15 +362,30 @@
       var _Self = this;
       var prodictResult = $('.prodict-result'), prodictStr= '', str = '猜对预计可得<span>40积分</span>，仅供参考';
       $('.bet-ul li').on('click', function(el) {
-      //TODO 这里记得修改7月9号的那个日期，那个日期是从api接口里面返回。
-      //点击涨和跌的时候记得使用内部浏览器打开www.baid.com即可。
 
-      // 当前页面跳转到baidu => window.location.href = 'https://www.baidu.com'
-      // 新页面打来百度的方法 =》 window.open('https://www.baidu.com', '_blank')
         el.preventDefault();
         $(this).addClass('current').siblings('li').removeClass('current');
         var thisVal = $(this).data('value');
-        prodictStr = '猜对预计可得<span>' + thisVal + '积分</span>，仅供参考'
+
+        var fthisVal = parseFloat(thisVal).toFixed(2);
+
+    
+        // 总奖金池
+        var newamounts = parseFloat(info.amounts[0] + info.amounts[1]).toFixed(2);
+
+        var gthisVal = fthisVal;
+
+        var total = parseFloat(parseFloat(fthisVal) * (parseFloat(newamounts) + parseFloat(fthisVal))).toFixed(2);
+
+        if ($('.look').hasClass('look-up')){
+            var totalyes = parseFloat(fthisVal +  parseFloat(info.amounts[0]).toFixed(2)).toFixed(2);
+            gthisVal = parseFloat(total/totalyes).toFixed(2);
+        }else{
+            var totalno = parseFloat(fthisVal +  parseFloat(info.amounts[1]).toFixed(2)).toFixed(2);
+            gthisVal = parseFloat(total/totalno).toFixed(2);
+        }
+        
+        prodictStr = '猜对预计可得<span>' + gthisVal + 'ELA</span>，仅供参考'
         prodictResult.empty().html(prodictStr);
       })
     },
@@ -448,12 +402,6 @@
       $('.btns-box div').on('click', function(el) {
         var $this = $(this)
         el.preventDefault()
-        if (_Self.dataHour == 15 && _Self.dataMinute <= 30) {
-          prodictDOm.find('h4').empty().text('当日预言已经截止')
-          prodictDOm.find('p').empty().text('请15:30分后预言下一场')
-          btnsBox.hide()
-          prodictDOm.show()
-        }
         // 看涨
         if($this.hasClass('up')) {
           lookWrap.find('.look').removeClass('look-down').addClass('look-up')
@@ -491,6 +439,24 @@
         lookWrap.fadeOut(200)
         $('.btns-box').fadeOut(200)
         prodictDOm.fadeIn(300)
+        
+      //TODO 这里记得修改7月9号的那个日期，那个日期是从api接口里面返回。
+      //点击涨和跌的时候记得使用内部浏览器打开www.baid.com即可。
+
+      // 当前页面跳转到baidu => window.location.href = 'https://www.baidu.com'
+      // 新页面打来百度的方法 =》
+	  var preurl = 'elaphant://elapay?AppID=fdde367ea6b90e02930cfc9f7477ca0a6378346683ecf73d758c594dfdccc2bd969e9b6c7a63072e8255916b05c063a6403357f1d2d7f4c90a6fd4fb07fee60f&AppName=guessbtc&Description=guessbtc&DID=iWGmSX9T4JnHjX61ns3QqpsMTuEs2tPYhj&PublicKey=03e2422dcb4e54f26448293f7922b223576944fe9d149a86cbce8fd0fc75d20d6e&CoinName=ELA';
+
+      var fthisVal = parseFloat(prodictR.value).toFixed(4); 
+	  var amount = '&Amount=' + fthisVal;
+	  if(thisStatus && thisStatus == 'true') {
+		amount= amount + '0888';
+	  } else{
+		amount= amount + '0555';  
+	  }
+	  //console.error(amount);
+	  var address ='&ReceivingAddress=EgJtsdXMrjpsFGyGpTGTBZfAi2pp1PmGC2';
+      window.open(preurl + amount + address, '_blank')
       })
     }
   }
