@@ -281,17 +281,18 @@
             rightPercent.animate(downProgressBar);
             rightPercent.html(downProgressBar);
 
-            // TODO cookies里需要存储竞猜选择及时间戳
-            // 根据时间及cookies识别——竞猜按钮/已竞猜/不能竞猜/竞猜结果
-
             var prodictDOm = $('.prodict-dom'), btnsBox = $('.btns-box');
-            var prodictLast, prodictHistory = JSON.parse(window.localStorage.getItem('prodictHistory')) || []
-            if(prodictHistory.length > 0) {
-              prodictLast = prodictHistory[prodictHistory.length -1]
-            }
+            
+            var prodictLast, prodictHistory;
+            //TODO 暂时写不写入本地cookie，待新功能开发完完成后再验证
+            //var prodictLast, prodictHistory = JSON.parse(window.localStorage.getItem('prodictHistory')) || []
+            //if(prodictHistory.length > 0) {
+            //  prodictLast = prodictHistory[prodictHistory.length -1]
+            //}
+            
             //规则   0-12点前，如果当期没有预期过，则可以预测，已经预测过，显示预测结果
             //      12-15点 如果当期没有预期过，则提示请在15:00分后预言下一场，已经预测过，显示预测结果
-            //        15-24点 如果下一期没有预期过，则可以预测，已经预测过，显示预测结果
+            //      15-24点 如果下一期没有预期过，则可以预测，已经预测过，显示预测结果
 
             if(_Self.dataHour < voteEndtime) {
               if(prodictLast) {
@@ -368,21 +369,24 @@
         var thisVal = $(this).data('value');
 
         var fthisVal = parseFloat(thisVal).toFixed(2);
+        
+        var uptotal =  parseFloat(info.amounts[0]).toFixed(2);
+        
+        var downtotal =  parseFloat(info.amounts[1]).toFixed(2);
 
     
         // 总奖金池
-        var newamounts = parseFloat(info.amounts[0] + info.amounts[1]).toFixed(2);
+        var newamounts = parseFloat(parseFloat(uptotal) + parseFloat(downtotal) + parseFloat(fthisVal)).toFixed(2);
 
         var gthisVal = fthisVal;
 
-        var total = parseFloat(parseFloat(fthisVal) * (parseFloat(newamounts) + parseFloat(fthisVal))).toFixed(2);
 
-        if ($('.look').hasClass('look-up')){
-            var totalyes = parseFloat(fthisVal +  parseFloat(info.amounts[0]).toFixed(2)).toFixed(2);
-            gthisVal = parseFloat(total/totalyes).toFixed(2);
+         if ($('.look').hasClass('look-up')){
+            var totalyes = parseFloat(parseFloat(fthisVal) + parseFloat(uptotal)).toFixed(2);
+            gthisVal = parseFloat(parseFloat(newamounts)*parseFloat(fthisVal)/parseFloat(totalyes)).toFixed(2);
         }else{
-            var totalno = parseFloat(fthisVal +  parseFloat(info.amounts[1]).toFixed(2)).toFixed(2);
-            gthisVal = parseFloat(total/totalno).toFixed(2);
+            var totalno = parseFloat(parseFloat(fthisVal) + parseFloat(downtotal)).toFixed(2);
+            gthisVal = parseFloat(parseFloat(newamounts)*parseFloat(fthisVal)/parseFloat(totalno)).toFixed(2);
         }
         
         prodictStr = '猜对预计可得<span>' + gthisVal + 'ELA</span>，仅供参考'
@@ -445,17 +449,17 @@
 
       // 当前页面跳转到baidu => window.location.href = 'https://www.baidu.com'
       // 新页面打来百度的方法 =》
-	  var preurl = 'elaphant://elapay?AppID=fdde367ea6b90e02930cfc9f7477ca0a6378346683ecf73d758c594dfdccc2bd969e9b6c7a63072e8255916b05c063a6403357f1d2d7f4c90a6fd4fb07fee60f&AppName=guessbtc&Description=guessbtc&DID=iWGmSX9T4JnHjX61ns3QqpsMTuEs2tPYhj&PublicKey=03e2422dcb4e54f26448293f7922b223576944fe9d149a86cbce8fd0fc75d20d6e&CoinName=ELA';
+      var preurl = 'elaphant://elapay?AppID=fdde367ea6b90e02930cfc9f7477ca0a6378346683ecf73d758c594dfdccc2bd969e9b6c7a63072e8255916b05c063a6403357f1d2d7f4c90a6fd4fb07fee60f&AppName=guessbtc&Description=guessbtc&DID=iWGmSX9T4JnHjX61ns3QqpsMTuEs2tPYhj&PublicKey=03e2422dcb4e54f26448293f7922b223576944fe9d149a86cbce8fd0fc75d20d6e&CoinName=ELA';
 
       var fthisVal = parseFloat(prodictR.value).toFixed(4); 
-	  var amount = '&Amount=' + fthisVal;
-	  if(thisStatus && thisStatus == 'true') {
-		amount= amount + '0888';
-	  } else{
-		amount= amount + '0555';  
-	  }
-	  //console.error(amount);
-	  var address ='&ReceivingAddress=EgJtsdXMrjpsFGyGpTGTBZfAi2pp1PmGC2';
+      var amount = '&Amount=' + fthisVal;
+      if(thisStatus && thisStatus == 'true') {
+        amount= amount + '0888';
+      } else{
+        amount= amount + '0555';  
+      }
+      //console.error(amount);
+      var address ='&ReceivingAddress=EgJtsdXMrjpsFGyGpTGTBZfAi2pp1PmGC2';
       window.open(preurl + amount + address, '_blank')
       })
     }
