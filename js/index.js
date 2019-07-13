@@ -332,7 +332,7 @@
               // 根据最后一个历史时间戳的hour来判断同一天预测的是上午还是下午预测的
               var lastHour = new Date(prodictLast.timestamp).getHours();
               if(prodictLast) {
-                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate && lastHour >= voteBegintime + 20 ) {
+                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate && lastHour >= voteBegintime) {
                   if(prodictLast.status == 1) {
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
                   } else {
