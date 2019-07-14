@@ -1,4 +1,5 @@
 ;(function (factory) {
+	//time 201907141645
     var registeredInModuleLoader = false;
     if (typeof define === 'function' && define.amd) {
         define(factory);
@@ -317,9 +318,9 @@
               if(prodictLast) {
                 if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate || factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate) {
                   if(prodictLast.status == 1) {
-                    prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
+                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ElA <span class="dowm">涨</span>')
                   } else {
-                    prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
+                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ElA <span class="dowm">跌</span>')
                   }
                   prodictDOm.find('p').empty().text('今日15:00分结果揭晓')
                 }
@@ -333,9 +334,9 @@
               if(prodictLast) {
                 if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate || factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate) {
                   if(prodictLast.status == 1) {
-                    prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
+                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ElA <span class="dowm">涨</span>')
                   } else {
-                    prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
+                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ElA <span class="dowm">跌</span>')
                   }
                   prodictDOm.find('p').empty().text('预计今日15:00分结果揭晓')
                 } else {
@@ -354,9 +355,9 @@
               if(prodictLast) {
                 if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate && lastHour >= voteBegintime) {
                   if(prodictLast.guessstatus == 1) {
-                    prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
+                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ElA <span class="dowm">涨</span>')
                   } else {
-                    prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
+                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ElA <span class="dowm">跌</span>')
                   }
                   prodictDOm.find('p').empty().text('预计下一个交易日15：00结果揭晓')
                   btnsBox.hide()
@@ -451,14 +452,12 @@
         // 1表示涨， 2表示跌
         if(thisStatus && thisStatus == 'true') {
           //prodictR.status = 1
-          prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
+          prodictDOm.find('h4').empty().html('您已预言' + prodictR.value + 'ElA <span class="dowm">涨</span>')
         } else {
           //prodictR.status = 2
-          prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
+          prodictDOm.find('h4').empty().html('您已预言' + prodictR.value + 'ElA <span class="dowm">跌</span>')
         }
-        //prodictR.timestamp = new Date().getTime()
-        //prodictHistory.push(prodictR)
-        //window.localStorage.setItem('prodictHistory', JSON.stringify(prodictHistory));
+
         lookWrap.fadeOut(200)
         $('.btns-box').fadeOut(200)
         prodictDOm.fadeIn(300)
