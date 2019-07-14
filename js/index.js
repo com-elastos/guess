@@ -273,7 +273,12 @@
             // 进度百分比
             var leftPercent = $('.percent');
             var rightPercent = $('.right-percent');
-            var upPercent = Math.round(info.wallets[0] * 100 / (info.wallets[0] + info.wallets[1]));
+			var upPercent = 50;
+			if ((Math.abs(info.wallets[0]) > Number.EPSILON) || (Math.abs(info.wallets[1]) > Number.EPSILON))
+			{
+				upPercent = Math.round(info.wallets[0] * 100 / (info.wallets[0] + info.wallets[1]));
+			}
+
             var progressBar = upPercent + '%';
             var downProgressBar = (100 - upPercent) + '%';
             leftPercent.animate({width: progressBar});
@@ -330,8 +335,8 @@
               btnsBox.hide()
               prodictDOm.show()
             } else {
-              // 根据最后一个历史时间戳的hour来判断同一天预测的是上午还是下午预测的
-              var lastHour = new Date(prodictLast.timestamp).getHours();
+              // 根据最后一个历史时间戳的hour来判断同一天预测的是上午还是下午预测的,时间戳等回调函数处理
+              //var lastHour = new Date(prodictLast.timestamp).getHours();
               if(prodictLast) {
                 if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate && lastHour >= voteBegintime) {
                   if(prodictLast.status == 1) {
