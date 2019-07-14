@@ -166,11 +166,13 @@
 ;(function(global, factory) {
   // 调用一些factory方法
   var factoryMethods = factory(global)
-  
+
   var voteEndtime = 12;
-  
+
   var voteBegintime= 15;
-  
+
+  var prodictLast;
+
   var info
 
   var appGuess = {
@@ -204,6 +206,19 @@
       // 初始化API地址
       // this.initApi()
 
+     var guessstatus = factoryMethods.getQueryString("guessstatus");
+     if (guessstatus){
+        var subscribe = {}
+
+        subscribe.value = factoryMethods.getQueryString("value");
+        subscribe.guessstatus = guessstatus;
+
+        subscribe.timestamp = new Date().getTime()
+// console.error(subscribe.value);
+//        console.error(subscribe.guessStatus);
+        window.localStorage.setItem('subscribeLast', JSON.stringify(subscribe));
+     }
+
       // Ajax设置
       $.ajaxSetup({
         // type: 'POST',
@@ -218,7 +233,7 @@
 
       // 请求用户初始化接口
       this.initData()
-      
+
       // 初始化选择语言积分数
       this.initBetUl()
 
@@ -228,7 +243,7 @@
     // initApi: function initApi() {
     //   var _Self = this;
     //   var localHost = window.location.host;
-    //   // 
+    //   //
     //   if(localHost == 'pact.youzu.com') {
     //     _Self.apiRoot = ''
     //   } else {
@@ -262,7 +277,7 @@
             // console.error(_Self.dataMonth);
             // console.error(_Self.dataDate);
             // console.error(_Self.dataHour);
-             
+
             _Self.dataMinute = dataTime.getMinutes();
             $('.mark').html(_Self.dataMonth + '月' + _Self.dataDate + '日 大盘指数:<span class="mark-desc">12000  2.58%</span>');
 
@@ -273,11 +288,11 @@
             // 进度百分比
             var leftPercent = $('.percent');
             var rightPercent = $('.right-percent');
-			var upPercent = 50;
-			if ((Math.abs(info.wallets[0]) > Number.EPSILON) || (Math.abs(info.wallets[1]) > Number.EPSILON))
-			{
-				upPercent = Math.round(info.wallets[0] * 100 / (info.wallets[0] + info.wallets[1]));
-			}
+            var upPercent = 50;
+            if ((Math.abs(info.wallets[0]) > Number.EPSILON) || (Math.abs(info.wallets[1]) > Number.EPSILON))
+            {
+                upPercent = Math.round(info.wallets[0] * 100 / (info.wallets[0] + info.wallets[1]));
+            }
 
             var progressBar = upPercent + '%';
             var downProgressBar = (100 - upPercent) + '%';
@@ -287,14 +302,13 @@
             rightPercent.html(downProgressBar);
 
             var prodictDOm = $('.prodict-dom'), btnsBox = $('.btns-box');
-            
-            var prodictLast, prodictHistory;
-            //TODO 暂时写不写入本地cookie，待新功能开发完完成后再验证
-            //var prodictLast, prodictHistory = JSON.parse(window.localStorage.getItem('prodictHistory')) || []
-            //if(prodictHistory.length > 0) {
-            //  prodictLast = prodictHistory[prodictHistory.length -1]
-            //}
-            
+
+
+
+
+            prodictLast = JSON.parse(window.localStorage.getItem('subscribeLast')) || []
+//          console.error(prodictLast);
+
             //规则   0-12点前，如果当期没有预期过，则可以预测，已经预测过，显示预测结果
             //      12-15点 如果当期没有预期过，则提示请在15:00分后预言下一场，已经预测过，显示预测结果
             //      15-24点 如果下一期没有预期过，则可以预测，已经预测过，显示预测结果
@@ -308,12 +322,12 @@
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
                   }
                   prodictDOm.find('p').empty().text('今日15:00分结果揭晓')
-                } 
+                }
                 btnsBox.hide()
                 prodictDOm.show()
               } else {
                   btnsBox.show()
-                  prodictDOm.hide()  
+                  prodictDOm.hide()
               }
             } else if(_Self.dataHour >= voteEndtime && _Self.dataHour < voteBegintime ) {
               if(prodictLast) {
@@ -336,10 +350,10 @@
               prodictDOm.show()
             } else {
               // 根据最后一个历史时间戳的hour来判断同一天预测的是上午还是下午预测的,时间戳等回调函数处理
-              //var lastHour = new Date(prodictLast.timestamp).getHours();
+              var lastHour = new Date(prodictLast.timestamp).getHours();
               if(prodictLast) {
                 if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate && lastHour >= voteBegintime) {
-                  if(prodictLast.status == 1) {
+                  if(prodictLast.guessstatus == 1) {
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
                   } else {
                     prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
@@ -350,7 +364,7 @@
                 }
               } else {
                   btnsBox.show()
-                  prodictDOm.hide()  
+                  prodictDOm.hide()
               }
             }
         },
@@ -374,12 +388,12 @@
         var thisVal = $(this).data('value');
 
         var fthisVal = parseFloat(thisVal).toFixed(2);
-        
+
         var uptotal =  parseFloat(info.amounts[0]).toFixed(2);
-        
+
         var downtotal =  parseFloat(info.amounts[1]).toFixed(2);
 
-    
+
         // 总奖金池
         var newamounts = parseFloat(parseFloat(uptotal) + parseFloat(downtotal) + parseFloat(fthisVal)).toFixed(2);
 
@@ -393,7 +407,7 @@
             var totalno = parseFloat(parseFloat(fthisVal) + parseFloat(downtotal)).toFixed(2);
             gthisVal = parseFloat(parseFloat(newamounts)*parseFloat(fthisVal)/parseFloat(totalno)).toFixed(2);
         }
-        
+
         prodictStr = '猜对预计可得<span>' + gthisVal + 'ELA</span>，仅供参考'
         prodictResult.empty().html(prodictStr);
       })
@@ -431,24 +445,24 @@
             prodictR.value = $(item).attr('data-value')
           }
         })
-        
+
         // 只记录当前一条记录
-        var prodictHistory = JSON.parse(window.localStorage.getItem('prodictHistory')) || []
+        //var prodictHistory = JSON.parse(window.localStorage.getItem('prodictHistory')) || []
         // 1表示涨， 2表示跌
         if(thisStatus && thisStatus == 'true') {
-          prodictR.status = 1
+          //prodictR.status = 1
           prodictDOm.find('h4').empty().html('您已预言<span class="dowm">涨</span>')
         } else {
-          prodictR.status = 2
+          //prodictR.status = 2
           prodictDOm.find('h4').empty().html('您已预言<span class="dowm">跌</span>')
         }
-        prodictR.timestamp = new Date().getTime()
-        prodictHistory.push(prodictR)
-        window.localStorage.setItem('prodictHistory', JSON.stringify(prodictHistory));
+        //prodictR.timestamp = new Date().getTime()
+        //prodictHistory.push(prodictR)
+        //window.localStorage.setItem('prodictHistory', JSON.stringify(prodictHistory));
         lookWrap.fadeOut(200)
         $('.btns-box').fadeOut(200)
         prodictDOm.fadeIn(300)
-        
+
       //TODO 这里记得修改7月9号的那个日期，那个日期是从api接口里面返回。
       //点击涨和跌的时候记得使用内部浏览器打开www.baid.com即可。
 
@@ -456,16 +470,19 @@
       // 新页面打来百度的方法 =》
       var preurl = 'elaphant://elapay?AppID=fdde367ea6b90e02930cfc9f7477ca0a6378346683ecf73d758c594dfdccc2bd969e9b6c7a63072e8255916b05c063a6403357f1d2d7f4c90a6fd4fb07fee60f&AppName=guessbtc&Description=guessbtc&DID=iWGmSX9T4JnHjX61ns3QqpsMTuEs2tPYhj&PublicKey=03e2422dcb4e54f26448293f7922b223576944fe9d149a86cbce8fd0fc75d20d6e&CoinName=ELA';
 
-      var fthisVal = parseFloat(prodictR.value).toFixed(4); 
+      var fthisVal = parseFloat(prodictR.value).toFixed(4);
       var amount = '&Amount=' + fthisVal;
+      var returnurl = '&ReturnUrl=http://weelink.online/guess/index.html?guessstatus=';
       if(thisStatus && thisStatus == 'true') {
         amount= amount + '0888';
+        returnurl = returnurl + 1 + '&value=' + fthisVal;
       } else{
-        amount= amount + '0555';  
+        amount= amount + '0555';
+        returnurl = returnurl + 2 + '&value=' + fthisVal;
       }
-      //console.error(amount);
+ //console.error(returnurl);
       var address ='&ReceivingAddress=EgJtsdXMrjpsFGyGpTGTBZfAi2pp1PmGC2';
-      window.open(preurl + amount + address, '_blank')
+      window.open(preurl + amount + address + returnurl, '_blank')
       })
     }
   }
@@ -474,6 +491,15 @@
   appGuess.initDom();
 
 })(typeof window !== "undefined" ? window : this, function(window, $, noGlobal ) {
+
+      //获取url上的参数
+      var getQueryString =   function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]); return null;
+     }
+
+
 
   var formatDate =   function formatDate(time, fmt) {
     if(time == '' || time == null || time == undefined) {
@@ -496,14 +522,14 @@
       fmt = "yyyy-MM-dd HH:mm:ss";
     }
     var o = {
-      "M+": timer.getMonth() + 1, //月份         
-      "d+": timer.getDate(), //日         
-      "h+": timer.getHours() % 12 == 0 ? 12 : timer.getHours() % 12, //小时         
-      "H+": timer.getHours(), //小时         
-      "m+": timer.getMinutes(), //分         
-      "s+": timer.getSeconds(), //秒         
-      "q+": Math.floor((timer.getMonth() + 3) / 3), //季度         
-      "S": timer.getMilliseconds() //毫秒         
+      "M+": timer.getMonth() + 1, //月份
+      "d+": timer.getDate(), //日
+      "h+": timer.getHours() % 12 == 0 ? 12 : timer.getHours() % 12, //小时
+      "H+": timer.getHours(), //小时
+      "m+": timer.getMinutes(), //分
+      "s+": timer.getSeconds(), //秒
+      "q+": Math.floor((timer.getMonth() + 3) / 3), //季度
+      "S": timer.getMilliseconds() //毫秒
     };
     var week = {
       "0": "日",
@@ -529,6 +555,8 @@
   }
 
   return {
+    getQueryString: getQueryString,
     formatDate: formatDate
   }
+
 })
