@@ -188,8 +188,7 @@
     currentDate: factoryMethods.formatDate(this.currentTimestamp, 'yyyy-MM-dd'), // 当前时间日期
 
     initDom: function initDom() {
-      // 调用实例
-      // console.error(factoryMethods.formatDate('1562848146527', 'yyyy-MM-dd'))
+      // 调用格式化时间实例
       // factoryMethods.formatDate('1562590479', 'yyyy-MM-dd HH:mm:ss')
 
       // Cookies.set('name', 'value', { expires: 7 });
@@ -199,10 +198,6 @@
       this.currentTimestamp = new Date().getTime()
       this.lastDate = factoryMethods.formatDate(this.lastTimestamp, 'yyyy-MM-dd')
       this.currentDate = factoryMethods.formatDate(this.currentTimestamp, 'yyyy-MM-dd')
-      // console.error(this.lastTimestamp)
-      // console.error(this.lastDate)
-      // console.error(this.currentTimestamp)
-      // console.error(this.currentDate)
 
       // 初始化API地址
       // this.initApi()
@@ -215,8 +210,6 @@
         subscribe.guessstatus = guessstatus;
 
         subscribe.timestamp = new Date().getTime()
-// console.error(subscribe.value);
-//        console.error(subscribe.guessStatus);
         window.localStorage.setItem('subscribeLast', JSON.stringify(subscribe));
      }
 
@@ -240,6 +233,9 @@
 
       // 初始化一些dom操作
       this.initSomeDom()
+
+      // 初始化轮播
+      this.initSwiper()
     },
     // initApi: function initApi() {
     //   var _Self = this;
@@ -275,10 +271,6 @@
             _Self.dataDate  = dataTime.getDate();
             _Self.dataHour = dataTime.getHours();
 
-            // console.error(_Self.dataMonth);
-            // console.error(_Self.dataDate);
-            // console.error(_Self.dataHour);
-
             _Self.dataMinute = dataTime.getMinutes();
             $('.mark').html(_Self.dataMonth + '月' + _Self.dataDate + '日 大盘指数:<span class="mark-desc">12000  2.58%</span>');
 
@@ -308,7 +300,6 @@
 
 
             prodictLast = JSON.parse(window.localStorage.getItem('subscribeLast')) || []
-//          console.error(prodictLast);
 
             //规则   0-12点前，如果当期没有预期过，则可以预测，已经预测过，显示预测结果
             //      12-15点 如果当期没有预期过，则提示请在15:00分后预言下一场，已经预测过，显示预测结果
@@ -479,10 +470,28 @@
         amount= amount + '0555';
         returnurl = returnurl + 2 + '&value=' + fthisVal;
       }
- //console.error(returnurl);
       var address ='&ReceivingAddress=EgJtsdXMrjpsFGyGpTGTBZfAi2pp1PmGC2';
       window.open(preurl + amount + address + '&ReturnUrl=' + encodeURIComponent(returnurl), '_blank')
       })
+    },
+
+    // 轮播
+    initSwiper: function initSwiper() {
+      if($('.swiper-container').length > 0) {
+        var mySwiper = new Swiper ('.swiper-container', {
+          loop: true, // 循环模式选项
+          autoplay: {
+            delay: 3000,
+            stopOnLastSlide: false,
+            disableOnInteraction: true,
+          },
+          
+          // 如果需要分页器
+          pagination: {
+            el: '.swiper-pagination',
+          }
+        })
+      }
     }
   }
 
