@@ -1,5 +1,5 @@
 ;(function (factory) {
-	//time 201907141645
+	//time 201907151357
     var registeredInModuleLoader = false;
     if (typeof define === 'function' && define.amd) {
         define(factory);
@@ -318,11 +318,11 @@
               if(prodictLast) {
                 if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate || factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate) {
                   if(prodictLast.status == 1) {
-                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ElA <span class="dowm">涨</span>')
+                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ELA <span class="dowm">涨</span>')
                   } else {
-                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ElA <span class="dowm">跌</span>')
+                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ELA <span class="dowm">跌</span>')
                   }
-                  prodictDOm.find('p').empty().text('今日15:00分结果揭晓')
+                  prodictDOm.find('p').empty().text('今日15:00结果揭晓')
                 }
                 btnsBox.hide()
                 prodictDOm.show()
@@ -334,18 +334,18 @@
               if(prodictLast) {
                 if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate || factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate) {
                   if(prodictLast.status == 1) {
-                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ElA <span class="dowm">涨</span>')
+                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ELA <span class="dowm">涨</span>')
                   } else {
-                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ElA <span class="dowm">跌</span>')
+                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ELA <span class="dowm">跌</span>')
                   }
-                  prodictDOm.find('p').empty().text('预计今日15:00分结果揭晓')
+                  prodictDOm.find('p').empty().text('预计今日15:00结果揭晓')
                 } else {
                   prodictDOm.find('h4').empty().text('当日预言已经截止')
-                  prodictDOm.find('p').empty().text('请在15:00分后预言下一场')
+                  prodictDOm.find('p').empty().text('请在15:00后预言下一场')
                 }
               } else {
                 prodictDOm.find('h4').empty().text('当日预言已经截止')
-                prodictDOm.find('p').empty().text('请在15:00分后预言下一场')
+                prodictDOm.find('p').empty().text('请在15:00后预言下一场')
               }
               btnsBox.hide()
               prodictDOm.show()
@@ -355,9 +355,9 @@
               if(prodictLast) {
                 if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate && lastHour >= voteBegintime) {
                   if(prodictLast.guessstatus == 1) {
-                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ElA <span class="dowm">涨</span>')
+                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ELA <span class="dowm">涨</span>')
                   } else {
-                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ElA <span class="dowm">跌</span>')
+                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ELA <span class="dowm">跌</span>')
                   }
                   prodictDOm.find('p').empty().text('预计下一个交易日15：00结果揭晓')
                   btnsBox.hide()
@@ -452,10 +452,10 @@
         // 1表示涨， 2表示跌
         if(thisStatus && thisStatus == 'true') {
           //prodictR.status = 1
-          prodictDOm.find('h4').empty().html('您已预言' + prodictR.value + 'ElA <span class="dowm">涨</span>')
+          prodictDOm.find('h4').empty().html('您已预言' + prodictR.value + 'ELA <span class="dowm">涨</span>')
         } else {
           //prodictR.status = 2
-          prodictDOm.find('h4').empty().html('您已预言' + prodictR.value + 'ElA <span class="dowm">跌</span>')
+          prodictDOm.find('h4').empty().html('您已预言' + prodictR.value + 'ELA <span class="dowm">跌</span>')
         }
 
         lookWrap.fadeOut(200)
@@ -471,7 +471,7 @@
 
       var fthisVal = parseFloat(prodictR.value).toFixed(4);
       var amount = '&Amount=' + fthisVal;
-      var returnurl = '&ReturnUrl=http://weelink.online/guess/index.html?guessstatus=';
+      var returnurl = 'http://weelink.online/guess/index.html?guessstatus=';
       if(thisStatus && thisStatus == 'true') {
         amount= amount + '0888';
         returnurl = returnurl + 1 + '&value=' + fthisVal;
@@ -481,7 +481,7 @@
       }
  //console.error(returnurl);
       var address ='&ReceivingAddress=EgJtsdXMrjpsFGyGpTGTBZfAi2pp1PmGC2';
-      window.open(preurl + amount + address + returnurl, '_blank')
+      window.open(preurl + amount + address + '&ReturnUrl=' + encodeURIComponent(returnurl), '_blank')
       })
     }
   }
