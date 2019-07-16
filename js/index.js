@@ -1,5 +1,5 @@
 ;(function (factory) {
-	//time 201907151357
+    //time 201907151357
     var registeredInModuleLoader = false;
     if (typeof define === 'function' && define.amd) {
         define(factory);
@@ -304,46 +304,53 @@
             //规则   0-12点前，如果当期没有预期过，则可以预测，已经预测过，显示预测结果
             //      12-15点 如果当期没有预期过，则提示请在15:00分后预言下一场，已经预测过，显示预测结果
             //      15-24点 如果下一期没有预期过，则可以预测，已经预测过，显示预测结果
+//console.error(prodictLast);
+//console.error(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd'));
+           // 根据最后一个历史时间戳的hour来判断同一天预测的是上午还是下午预测的,时间戳等回调函数处理
 
             if(_Self.dataHour < voteEndtime) {
-              if(prodictLast) {
-                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate || factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate) {
-                  if(prodictLast.status == 1) {
-                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ELA <span class="dowm">涨</span>')
-                  } else {
-                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ELA <span class="dowm">跌</span>')
-                  }
-                  prodictDOm.find('p').empty().text('今日15:00结果揭晓')
-                }
-                btnsBox.hide()
-                prodictDOm.show()
+              if(prodictLast &&
+                   (factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate
+                || factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate)) {
+                      if (factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate){
+                        var lastHour = new Date(prodictLast.timestamp).getHours();
+                        if (lastHour <= voteBegintime){
+                            btnsBox.show();
+                            prodictDOm.hide();
+                            return;
+                        }
+                      }
+
+                      if(prodictLast.status == 1) {
+                        prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ELA <span class="dowm">涨</span>')
+                      } else {
+                        prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ELA <span class="dowm">跌</span>')
+                      }
+                      prodictDOm.find('p').empty().text('今日15:00结果揭晓')
+
+                    btnsBox.hide();
+                    prodictDOm.show();
               } else {
-                  btnsBox.show()
-                  prodictDOm.hide()
+                  btnsBox.show();
+                  prodictDOm.hide();
               }
-            } else if(_Self.dataHour >= voteEndtime && _Self.dataHour < voteBegintime ) {
-              if(prodictLast) {
-                if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.lastDate || factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate) {
-                  if(prodictLast.status == 1) {
-                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ELA <span class="dowm">涨</span>')
-                  } else {
-                    prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ELA <span class="dowm">跌</span>')
-                  }
-                  prodictDOm.find('p').empty().text('预计今日15:00结果揭晓')
-                } else {
-                  prodictDOm.find('h4').empty().text('当日预言已经截止')
-                  prodictDOm.find('p').empty().text('请在15:00后预言下一场')
-                }
-              } else {
-                prodictDOm.find('h4').empty().text('当日预言已经截止')
-                prodictDOm.find('p').empty().text('请在15:00后预言下一场')
-              }
-              btnsBox.hide()
-              prodictDOm.show()
+            } else if(_Self.dataHour >= voteEndtime && _Self.dataHour < voteBegintime) {
+                  if (prodictLast && (factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate)) {
+                      if(prodictLast.status == 1) {
+                        prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ELA <span class="dowm">涨</span>')
+                      } else {
+                        prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ELA <span class="dowm">跌</span>')
+                      }
+                      prodictDOm.find('p').empty().text('预计今日15:00结果揭晓')
+                    } else {
+                      prodictDOm.find('h4').empty().text('当日预言已经截止')
+                      prodictDOm.find('p').empty().text('请在15:00后预言下一场')
+                    }
+                btnsBox.hide();
+                prodictDOm.show();
             } else {
-              // 根据最后一个历史时间戳的hour来判断同一天预测的是上午还是下午预测的,时间戳等回调函数处理
-              var lastHour = new Date(prodictLast.timestamp).getHours();
               if(prodictLast) {
+                var lastHour = new Date(prodictLast.timestamp).getHours();
                 if(factoryMethods.formatDate(prodictLast.timestamp, 'yyyy-MM-dd') == _Self.currentDate && lastHour >= voteBegintime) {
                   if(prodictLast.guessstatus == 1) {
                     prodictDOm.find('h4').empty().html('您已预言' + prodictLast.value + 'ELA <span class="dowm">涨</span>')
@@ -485,7 +492,7 @@
             stopOnLastSlide: false,
             disableOnInteraction: true,
           },
-          
+
           // 如果需要分页器
           pagination: {
             el: '.swiper-pagination',
