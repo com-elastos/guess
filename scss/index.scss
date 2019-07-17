@@ -83,7 +83,6 @@ html,body {
 
 .module-three {
   margin-top: .3rem;
-  height: 2.0rem;
   padding: 0 .2rem;
   .three-top {
     margin-bottom: .2rem;
@@ -185,6 +184,120 @@ html,body {
       color: #79aafe;
       font-weight: 600;
     }
+  }
+}
+
+.module-four {
+  margin-top: .3rem;
+  // width: auto;
+  // height: auto;
+  padding: .2rem;
+  background-color: #f5f5f5;
+  border-radius: .1rem;
+  h4 {
+    position: relative;
+    margin-bottom: .3rem;
+    font-size: .40rem;
+    color: #000000;
+    text-align: center;
+    &:before {
+      position: absolute;
+      content: '';
+      display: block;
+      top: .3rem;
+      right: .5rem;
+      height: 1px;
+      width: 1.8rem;
+      background-color: #999;
+    }
+    &:after {
+      position: absolute;
+      content: '';
+      display: block;
+      top: .3rem;
+      left: .5rem;
+      height: 1px;
+      width: 1.8rem;
+      background-color: #999;
+    }
+  }
+  .rank-box{
+    position: relative;
+    padding: .2rem;
+    li {
+      margin-bottom: .1rem;
+      height: 1rem;
+      background-color: #fff;
+      border-radius: .05rem;
+      display: flex;
+      flex-wrap: wrap;
+      .num {
+        margin: 0.3rem .2rem;
+        width: .49rem;
+        height: .44rem;
+        color: #858585;
+        line-height: .49rem;
+        text-align: center;
+        font-weight: bold;
+        font-size: .2rem;
+      }
+      .icon {
+        height: .52rem;
+        margin: .24rem 0;
+      }
+      .name-nick {
+        padding: .2rem 0.3rem .2rem .2rem;
+        font-size: .2rem;
+        width: 2rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        h5 {
+          color: #6a6a6a;
+          font-weight: bold;
+        }
+        p {
+          color: #9a9a9a;
+        }
+      }
+      .achieve {
+        padding: .2rem;
+        p {
+          font-size: .18rem;
+          color: #898989;
+        }
+      }
+      .result {
+        padding: .2rem;
+        p {
+          font-size: .18rem;
+          color: #898989;
+        }
+      }
+    }
+    li:first-child {
+      .num {
+        background: url(../img/rank-1.png) no-repeat center center;
+        background-size: contain;
+        color: transparent;
+      }
+    }
+    li:nth-child(2) {
+      .num {
+        background: url(../img/rank-2.png) no-repeat center center;
+        background-size: contain;
+        color: transparent;
+      }
+    }
+    li:nth-child(3) {
+      .num {
+        background: url(../img/rank-3.png) no-repeat center center;
+        background-size: contain;
+        color: transparent;
+      }
+    }
+    // width: auto;
+    // height: auto;
   }
 }
 

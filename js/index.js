@@ -228,6 +228,9 @@
       // 请求用户初始化接口
       this.initData()
 
+      // 初始化排行榜数据
+      this.initRank()
+
       // 初始化选择语言积分数
       this.initBetUl()
 
@@ -276,6 +279,9 @@
 
             // 价格波动 // TODO 可以考虑数字颜色——红涨绿跌，根据incressRate的正负识别涨跌
             var incressRate = ((info.prices[1] - info.prices[0]) * 100 / info.prices[0]).toFixed(2);
+            if(incressRate >0) {
+              $('.mark-desc').addClass('up-color')
+            }
             $('.mark-desc').html(info.prices[1] + '   ' + incressRate + '%');
 
             // 进度百分比
@@ -376,6 +382,24 @@
       })
     },
 
+    // 排行榜
+    initRank: function initRank() {
+      var _Self = this;
+      $.ajax({
+        data: {},
+        type: 'GET',
+        url: _Self.apiRoot + '2.json',
+        xhrFields: {
+          withCredentials: false // 设置为true时开启cookies，但是方法会报错
+        },
+        success: function(res) {
+          
+        },
+        error: function(err) {
+          console.error(err)
+        }
+      })
+    },
     // 点击档位，结果预览
     initBetUl: function initBetUl() {
       var _Self = this;
