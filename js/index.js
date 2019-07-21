@@ -174,6 +174,8 @@
 
   var prodictLast;
 
+  var DIDData;
+
   var info
 
   var appGuess = {
@@ -224,6 +226,8 @@
           withCredentials: true
         }
       })
+
+      //this.initDid();
 
       // 请求用户初始化接口
       this.initData()
@@ -393,7 +397,19 @@
           withCredentials: false // 设置为true时开启cookies，但是方法会报错
         },
         success: function(res) {
-          
+          var data = res.data[0], counts = data.counts, wallets = data.wallets;
+          var rankBox = $('.rank-box'), rankStr='';
+          for (var index = 0; index < wallets.length; index++) {
+            if(DIDData){
+                if(DIDData.ELAAddress == wallets[index]) {
+                    wallets[index] = DIDData.DID;
+                }
+            }
+            rankStr +='<li><span class="num">1</span><img class="icon" src="./img/user-icon.png" alt="" srcset="">' +
+            '<div class="name-nick"><h5>'+wallets[index]+'</h5><p>王者预言家</p></div><div class="achieve">' +
+            '<p class="red"></p><p></p></div><div class="result"><p>'+counts[index]+'次</p><p>预言战绩</p></div></li>'
+          }
+          rankBox.empty().html(rankStr)
         },
         error: function(err) {
           console.error(err)
@@ -504,6 +520,27 @@
       var address ='&ReceivingAddress=EgJtsdXMrjpsFGyGpTGTBZfAi2pp1PmGC2';
       window.open(preurl + amount + address + '&ReturnUrl=' + encodeURIComponent(returnurl), '_blank')
       })
+    },
+
+    initDid: function initDid() {
+      var _Self = this;
+
+     var DIDNewData = factoryMethods.getQueryString("Data");
+     if (DIDNewData){
+        var didkey = DIDNewData.DID;
+        window.localStorage.setItem('DIDData', JSON.stringify(DIDNewData));
+     }
+
+    DIDData = JSON.parse(window.localStorage.getItem('DIDData')) || [];
+    if(!DIDData) {
+
+      // 当前页面跳转到baidu => window.location.href = 'https://www.baidu.com'
+      // 新页面打来百度的方法 =》
+      var preurl = 'elaphant://identity?AppID=fdde367ea6b90e02930cfc9f7477ca0a6378346683ecf73d758c594dfdccc2bd969e9b6c7a63072e8255916b05c063a6403357f1d2d7f4c90a6fd4fb07fee60f&AppName=guessbtc&Description=guessbtc&DID=iWGmSX9T4JnHjX61ns3QqpsMTuEs2tPYhj&PublicKey=03e2422dcb4e54f26448293f7922b223576944fe9d149a86cbce8fd0fc75d20d6e&CoinName=ELA';
+
+      var returnurl = 'http://weelink.online/guess/index.html';
+      window.open(preurl + amount +'&ReturnUrl=' + encodeURIComponent(returnurl), '_blank');
+    }
     },
 
     // 轮播
