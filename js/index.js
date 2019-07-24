@@ -209,7 +209,7 @@
         var subscribe = {}
 
         subscribe.value = factoryMethods.getQueryString("value");
-        subscribe.guessstatus = guessstatus;
+        subscribe.status = guessstatus;
 
         subscribe.timestamp = new Date().getTime()
         window.localStorage.setItem('subscribeLast', JSON.stringify(subscribe));
