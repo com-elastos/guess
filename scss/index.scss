@@ -13,7 +13,7 @@ html,body {
   background-size: contain;
 }
 
-*.html,body {
+*,html,body {
   box-sizing: border-box;
 }
 
@@ -301,6 +301,7 @@ html,body {
   }
 }
 
+// 弹窗
 .dialog-wrap {
   position: fixed;
   display: none;
@@ -448,6 +449,20 @@ html,body {
   }
 }
 
+// 多语言
+.lang-box {
+  position: absolute;
+  top: .5rem;
+  right: .5rem;
+  width: .8rem;
+  height: .8rem;
+  background: url(../img/language.png) no-repeat center center;
+  background-size: cover;
+  .lang-ul {
+    position: absolute;
+  }
+}
+
 .red {
   color: red !important;
 }
@@ -496,80 +511,6 @@ html,body {
       }
       p + p{
         margin-top: .5rem;
-      }
-    }
-  }
-}
-// 轮播页面
-.page-carousel {
-  position: relative;
-  width: 100%;
-  padding: .2rem;
-  height: 100%;
-  min-height: 100%;
-  background-image: none;
-  background-color: #fff;
-  overflow: scroll;
-  .carousel-box {
-    width: auto;
-    height: 3.6rem;
-    .swiper-wrapper {
-      width: auto;
-      height: inherit;
-      .swiper-slide {
-        width: auto;
-        height: inherit;
-        cursor: pointer;
-        img {
-          width: inherit;
-          height: inherit;
-          border-radius: .08rem;
-        }
-      }
-    }
-  }
-
-  .module-palace{
-    margin-top: .6rem;
-    h3 {
-      margin: .15rem 0;
-      font-size: .4rem;
-      color: #383838;
-    }
-    .app-box{
-      width: 100%;
-      display: flex;
-      flex-wrap: wrap;
-      text-align: center;
-      >a {
-        margin-bottom: .3rem;
-        width: 23%;
-        height: 2.3rem;
-        text-align: center;
-        cursor: pointer;
-        overflow: hidden;
-        &:nth-of-type(4n+1) {
-          margin-left: 0; 
-        }
-        img {
-          display: inline-block;
-          width: 1.5rem;
-          height: 1.5rem;
-          border-radius: .2rem;
-          background-color: #999;
-          vertical-align: middle;
-        }
-        h5 {
-          margin-top: .1rem;
-          text-align: center;
-          font-size: .26rem;
-          line-height: .3rem;
-          color: #383838;
-          word-break: break-word;
-        }
-      }
-      a + a {
-        margin-left: 2.5%; 
       }
     }
   }
