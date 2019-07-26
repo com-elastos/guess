@@ -243,6 +243,12 @@
 
       // 初始化轮播
       this.initSwiper()
+
+      // 多语言模块
+      this.initMultiLang()
+
+      // 语言国际化
+      this.initLangI18n()
     },
     // initApi: function initApi() {
     //   var _Self = this;
@@ -560,7 +566,39 @@
           }
         })
       }
-    }
+    },
+
+    // 多语言模块
+    initMultiLang: function initMultiLang() {
+      var langBox = $('.lang-box');
+      langBox.on('click', function() {
+        langBox.find('ul').fadeToggle()
+      })
+    },
+
+    // 语言国际化
+    initLangI18n: function initLangI18n(lang) {
+      var lang= lang? lang: 'zh'
+      jQuery.i18n.properties({
+        // 加载资浏览器语言对应的资源文件
+        name: 'lang', // 资源文件名称
+        path: '/js/i18n/', // 资源文件路径
+        mode: 'map', // 用 Map 的方式使用资源文件中的值
+        language: lang,
+        cache: false,
+        encoding: 'UTF-8',
+        callback: function() { // 加载成功后设置显示内容
+          console.error(jQuery.i18n)
+          console.error(jQuery.i18n.prop('name'))
+          // // 显示“用户名”
+          // $('#label_username').html($.i18n.prop('string_username')); 
+          //   // 显示“密码”
+          // $('#label_password').html($.i18n.prop('string_password')); 
+          //     // 显示“登录”
+          // $('#button_login').val($.i18n.prop('string_login')); 
+        } 
+      })
+    } 
   }
 
   window.appGuess = appGuess;
