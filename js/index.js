@@ -411,7 +411,7 @@
                     wallets[index] = DIDData.DID;
                 }
             }
-            rankStr +='<li><span class="num">1</span><img class="icon" src="./img/user-icon.png" alt="" srcset="">' +
+            rankStr +='<li><span class="num">'+index+'</span><img class="icon" src="./img/user-icon.png" alt="" srcset="">' +
             '<div class="name-nick"><h5>'+wallets[index]+'</h5><p>王者预言家</p></div><div class="achieve">' +
             '<p class="red"></p><p></p></div><div class="result"><p>'+counts[index]+'次</p><p>预言战绩</p></div></li>'
           }
